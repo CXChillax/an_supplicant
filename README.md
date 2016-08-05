@@ -1,6 +1,6 @@
 # 关于supplicant.py
 基于Python的安腾小蝴蝶的全平台认证脚本，理论上可在windows、linux、osx、android、ios等可以安装python运行环境的系统下跑起。但目前属于测试阶段，可能会出现意想不到的错误，如果出错了，请告诉我：lyq19961011@gmail.com，我会尽力修复。  
-欢迎大家一起交流，因为程序还有很长一段路要走。
+欢迎大家一起交流。
 
 # 安师大用户：
 方案：内网认证使用mentohust，外网用本python脚本。已在linux，windows下测试通过。
