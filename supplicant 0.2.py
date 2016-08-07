@@ -149,22 +149,17 @@ def generate_downnet(mac, ip, session, index):
     packet = ''.join([struct.pack('B', i) for i in packet])
     return packet
 
-def input_():
-    username = raw_input("Username:")
-    password = getpass.getpass("Password:")
-    choose = username,password
-    if '' in choose:
-        print 'Username or password is empty!'
-        input_()
-    else:
-        return username,password
-
 def main():
     mac_address = get_mac_address()
     ip = Get_local_ip()
     host = gethost()
     print str('Notice: Ctrl + C to exit\nMAC:'),mac_address,str('\nHOST:'),host,str('\nIP:'),ip
-    username,password = input_()
+    username = raw_input("Username:")
+    password = getpass.getpass("Password:")
+    choose = username,password
+    if '' in choose:
+        print 'Username or password is empty!'
+        main()
     index = 0x01000000
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(10)
