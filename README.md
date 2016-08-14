@@ -59,6 +59,6 @@ windows用户：下载python运行环境并配置正确。windows＋r，输入cm
 ##0.2版 运行步骤:  
 和0.1一样，拖进去就行了...但使用前什么都不用改
 
-##future release:  
-将来我可能会吧0.2.x的版本封装，也就不需要配置Python环境这一步骤了。但0.1不会有太大的改动，因为是为无线路由器考虑的。  
+##future release demo:  
+安装wx框架，moudle是GUI测试版，跑起来了。  
 
