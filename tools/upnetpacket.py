@@ -1,8 +1,4 @@
-import sys
-import socket
 import struct
-import urllib2
-import time
 import hashlib
 
 def encrypt(buffer):
@@ -74,7 +70,7 @@ print str('all uncrypt:\n'),stri
 print '\n'
 stri=[chr(i) for i in packet]
 new=zip(packet,stri)
-print str('uncrypt and ascii is :'),new[26:]
+print str('uncrypt and ascii :'),new[26:]
 encrypt(packet)
 stri=[hex(i) for i in packet]
 print '\n'
