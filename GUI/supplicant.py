@@ -1,4 +1,3 @@
-#encoding: utf-8
 import wx
 import threading
 from wx.py.shell import ShellFrame
@@ -10,6 +9,8 @@ import socket
 import struct
 import time
 import connect
+import sys  
+
 
 class MyApp(wx.App):
     
@@ -29,18 +30,18 @@ class MyFrame(wx.Frame):
         self.IP=''
         wx.Frame.__init__(self, None, -1, title, pos, size)
         menuFile = wx.Menu()
-        menuFile.Append(1, "&使用说明...","程序使用说明以及注意事项")
-        menuFile.Append(3,"&偏好设置","设置host")
-        menuFile.AppendSeparator() #在about和exit之间创建一个分割线
-        menuFile.Append(2,"&Bug Report","报告长官！发现Bug")
+        menuFile.Append(1, "&Help...","")
+        menuFile.Append(3,"&Performance","host")
+        menuFile.AppendSeparator() 
+        menuFile.Append(2,"&Bug Report","Report a Bug to me")
         
         menuFile2 = wx.Menu()
         menuFile2.Append(4,"&Python Shell","Open Python Shell frame")
         menuFile2.Append(5,"&Namespace Viewer","Open namespace viewer frame")
         menuBar = wx.MenuBar()
-        menuBar.Append(menuFile, "&更多")
+        menuBar.Append(menuFile, "&More")
         menuBar.Append(menuFile2,"&Debug")
-        self.SetMenuBar(menuBar) #设置MenueBar and about python
+        self.SetMenuBar(menuBar) #Setting MenueBar and about python
         
         self.Bind(wx.EVT_MENU, self.OnAbout,id=1)
         self.Bind(wx.EVT_MENU,self.OnBugReport,id=2)
@@ -49,29 +50,29 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU,self.OnFilling,id=5)
         self.CreateStatusBar() 
         
-        self.SetStatusText("欢迎使用") #creat a StatusText and put text into 
+        self.SetStatusText("Welcome to use") #creat a StatusText and put text into 
         
         panel = wx.Panel(self) #redef panel
-        self.connect = wx.Button(panel,label="登录",pos=(240, 60),size=(50, 50))#creat a button with position size
-        self.disconnect = wx.Button(panel,label="下线",pos=(300,60),size=(50,50))#creat another button
+        self.connect = wx.Button(panel,label="Login",pos=(240, 60),size=(50, 50))#creat a button with position size
+        self.disconnect = wx.Button(panel,label="Disconnect",pos=(300,60),size=(50,50))#creat another button
         self.connect.Disable()
         self.disconnect.Disable()
         self.Bind(wx.EVT_BUTTON, self.OnDisconnect,self.disconnect)   #bind button to even close
         self.Bind(wx.EVT_BUTTON,self.OnConnect,self.connect)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)  #bind even close even
         
-        wx.StaticText(panel, -1, "用户名:", pos=(20, 40))
+        wx.StaticText(panel, -1, "Username:", pos=(8, 40))
         self.username = wx.TextCtrl(panel, -1 ,pos=(80, 40))
         self.username.SetInsertionPoint(0)
         self.Bind(wx.EVT_TEXT,self.Onuser,self.username)
-        wx.StaticText(panel,-1,"密码:",pos=(210,40))
+        wx.StaticText(panel,-1,"Password:",pos=(185,40))
         self.pwd = wx.TextCtrl(panel, -1,pos=(250,40),style=wx.TE_PASSWORD |wx.TE_PROCESS_ENTER)
         self.Bind(wx.EVT_TEXT,self.Onpwd,self.pwd)
  
         
         
-        wx.CheckBox(panel, -1, "自动登录", (20, 80), (150, 20))
-        wx.CheckBox(panel, -1, "保存密码", (100, 80), (150, 20))
+        wx.CheckBox(panel, -1, "Auto Login", (20, 80), (150, 20))
+        wx.CheckBox(panel, -1, "Save Password", (110, 80), (150, 20))
         
 
    
@@ -96,8 +97,8 @@ class MyFrame(wx.Frame):
         else:
             self.connect.Disable()
             self.disconnect.Enable()
-            wx.MessageBox('呼吸线程开启',message)
-            self.SetStatusText("认证成功")
+            wx.MessageBox('Breathe thread open',message)
+            self.SetStatusText("Auth is right")
             self.OnStartThread()
             
 
@@ -121,20 +122,20 @@ class MyFrame(wx.Frame):
         return True
     
     def OnDisconnect(self, event):
-        msgbox = wx.MessageDialog(None, "",'你确定要下线吗？',wx.YES_NO | wx.ICON_QUESTION)
+        msgbox = wx.MessageDialog(None, "",'Are you sure to login out',wx.YES_NO | wx.ICON_QUESTION)
         ret = msgbox.ShowModal()
         if (ret == wx.ID_YES):
             self.StopThreads()
-            wx.MessageBox( "程序即将退出",'\n下线了，呼吸线程关闭')
+            wx.MessageBox( "Progarm will exit",'\nYou have been login out,and breathe thread is stop')
             sys.exit()
             
 
      
     def OnAbout(self, event):
-        wx.MessageBox("个人项目，仅用于学习与交流，严禁用于hack。\n作者不负任何责任","关于", wx.OK | wx.ICON_INFORMATION, self) 
+        wx.MessageBox("Dont try to use this to hack","About this Program", wx.OK | wx.ICON_INFORMATION, self) 
 
     def OnBugReport(self,event):
-        wx.MessageBox("Gmail:lyq19961011@gmail.com","欢迎提交Bug",wx.OK | wx.ICON_INFORMATION,self)
+        wx.MessageBox("Gmail:lyq19961011@gmail.com","Welcome to report Bug",wx.OK | wx.ICON_INFORMATION,self)
 
     def OnShell(self, event):
         frame = ShellFrame(parent=self)
@@ -145,10 +146,12 @@ class MyFrame(wx.Frame):
         frame.Show()
 
     def OnCloseWindow(self, event):
+        self.StopThreads()
         self.Destroy()
+        sys.exit()
 
     def OnSet(self,event):
-        windows=wx.TextEntryDialog(None, "通常情况下不需要更改认证host",'偏好设置', '210.45.194.10')
+        windows=wx.TextEntryDialog(None, "host",'Perfermance', '210.45.194.10')
         windows.Show()
         if windows.ShowModal() == wx.ID_OK:
             response = windows.GetValue()
@@ -176,13 +179,13 @@ class PanelOne(wx.Panel):
     def __init__(self, parent):
         """Constructor"""
         wx.Panel.__init__(self, parent)
-        self.countdown = wx.StaticText(self, label="请在6秒后重试",pos=(160,60))
+        self.countdown = wx.StaticText(self, label="6seconds",pos=(160,60))
 
 class MainFrame(wx.Frame):
 
 
     def __init__(self):
-        wx.Frame.__init__(self, None, title="连接不成功",pos=(545,200),size=(420,150))
+        wx.Frame.__init__(self, None, title="Connect not right",pos=(545,200),size=(420,150))
         self.panelOne = PanelOne(self)
         self.time2die = 5
   
@@ -197,7 +200,7 @@ class MainFrame(wx.Frame):
     def update(self, event):
         
         if self.time2die > 0:
-            msg = "请在%s秒后重试" % self.time2die
+            msg = "%sseconds" % self.time2die
             self.panelOne.countdown.SetLabel(msg)
         else:
             self.Close()
