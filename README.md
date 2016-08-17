@@ -60,5 +60,5 @@ windows用户：下载python运行环境并配置正确。windows＋r，输入cm
 和0.1一样，拖进去就行了...但使用前什么都不用改
 
 ##future release demo:  
-安装wx框架，moudle是GUI测试版，跑起来了。  
+安装wx框架，GUI测试版，跑起来了。  
 
