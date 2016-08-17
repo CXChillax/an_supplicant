@@ -87,7 +87,7 @@ class MyFrame(wx.Frame):
         self.IP=ip
         upnet_net = packet.generate_upnet(mac, ip, Username, Password)
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        hosts = '210.45.194.18'
+        hosts = '210.45.194.10'
         status,message= connect.upnet(sock, upnet_net, hosts,self.getsession)
         if status == 0:
             msgbox = wx.MessageDialog(None, "",message,wx.OK)
@@ -218,7 +218,7 @@ class WorkerThread(threading.Thread):
         self.mac=mac
         self.ip=ip
         self.window=window
-        self.hosts='210.45.194.18'
+        self.hosts='210.45.194.10'
         self.sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.threadNum = 1
         self.timeToQuit = threading.Event()
