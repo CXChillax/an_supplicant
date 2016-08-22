@@ -65,7 +65,7 @@ class MyFrame(wx.Frame):
         self.username = wx.TextCtrl(panel, -1 ,pos=(80, 40))
         self.username.SetInsertionPoint(0)
         self.Bind(wx.EVT_TEXT,self.Onuser,self.username)
-        wx.StaticText(panel,-1,"Password:",pos=(185,40))
+        wx.StaticText(panel,-1,"Password:",pos=(182,40))
         self.pwd = wx.TextCtrl(panel, -1,pos=(250,40),style=wx.TE_PASSWORD |wx.TE_PROCESS_ENTER)
         self.Bind(wx.EVT_TEXT,self.Onpwd,self.pwd)
  

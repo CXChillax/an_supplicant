@@ -1,25 +1,25 @@
 # 关于supplicant.py
+项目主页：https://github.com/lyq1996/supplicant
 基于Python的安腾小蝴蝶的全平台认证脚本，理论上可在windows、linux、osx、android、ios等可以安装python运行环境的系统下跑起。但目前属于测试阶段，可能会出现意想不到的错误，如果出错了，请告诉我：lyq19961011@gmail.com。  
 
+##测试环境
+* OS X、windows、linux、android、（Openwrt暂未测试)
+* Python 2.7.x
+
 # AHNU用户：
-方案：内网认证使用mentohust，外网用本python脚本。已在linux，windows下测试通过。
-目前GUI还没有做完，只有osx有GUI内网认证界面。
+方案：内网认证使用mentohust，外网用本python脚本。已在linux，windows，os x下测试通过。
 
 
 # 其他学校的用户：
-如果你们学校校园网是蝴蝶，那么你完全可以用这个脚本去登录校园网,某些情况可能需要修改code，如果登录过程中出现错误，请你告诉我，我会去解决。
+如果你们学校校园网是蝴蝶，那么你完全可以用这个脚本去登录校园网,某些情况可能需要修改code，如果登录过程中出现错误，请你告诉我。
 
 # 已知bug：
  1、GUI的简直是BUG多的死。。。慢慢来吧
 
 ## release 0.1.x在osx、windows、linux下测试通过。  
-release 0.2.x是每次手动输入用户名和密码的，安全性较高...防止有人打开.py文件偷看你密码，是吧。。已在windows、osx、linux测试通过。
+release 0.2.x是每次手动输入用户名和密码的，安全性较高...防止有人打开.py文件偷看你密码，是吧。。已在osx、windows、linux测试通过。
   
-  关于我为什么要搞这两个版本：是为了脚本能方便的在Openwrt等等的第三方路由器系统跑起来。
-
-##测试环境
-* OS X、windows、linux、(android、Openwrt暂未测试)
-* Python 2.7.x
+  关于我为什么要搞这两个版本：是为了脚本能方便的在Openwrt等的第三方路由器系统跑起来(暂未实现）。
 
 
 ##0.1版 使用前的配置  
@@ -30,7 +30,7 @@ Mac用户推荐使用coderunner打开下载的py文件
 
 windows用户推荐使用Notepad＋＋打开下载的py文件  
 
-安卓在使用前请下载运行python2.7.x的软件，安卓目前正在测试中，服务器返回的packet解包报错。gbk编码问题，正在完善。
+安卓在使用前请下载Qpython。
 
 
 username = '' #在这里填上你的用户名
@@ -58,6 +58,6 @@ windows用户：下载python运行环境并配置正确。windows＋r，输入cm
 ##0.2版 运行步骤:  
 和0.1一样，拖进去就行了...但使用前什么都不用改
 
-##future release demo:  
-安装wx框架，GUI测试版，跑起来了。  
+##Future release demo:  
+安装wxpython框架，GUI测试版，跑起来了。  
 
