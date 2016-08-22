@@ -9,9 +9,9 @@ def decrypt(buffer):  #
 		buffer[i] = (buffer[i] & 0x80) >> 7 | (buffer[i] & 0x40) >> 2 | (buffer[i] & 0x20) >> 2 | (buffer[i] & 0x10) >> 2 | (buffer[i] & 0x08) << 2 | (buffer[i] & 0x04) << 4 | (buffer[i] & 0x02) << 6 | (buffer[i] & 0x01) << 1        
 	
 L=[]
-mac = ''
-user = ''
-pwd = ''
+mac = '23-23-23-23-23'
+user = 'qwerty'
+pwd = '123456'
 ip=''
 packet = []
 packet.append(1)
@@ -74,6 +74,8 @@ print str('uncrypt and ascii :'),new[26:]
 encrypt(packet)
 stri=[hex(i) for i in packet]
 print '\n'
-print str('hex and crypt:\n'),stri
+print str('hex and crypt:\n'),stri[26:]
+stri = [i for i in packet]
+print stri[26:]
 
 
