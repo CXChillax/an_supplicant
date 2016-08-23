@@ -53,7 +53,8 @@ class MyFrame(wx.Frame):
         self.SetStatusText("Welcome to use")
         
         panel = wx.Panel(self) 
-        self.connect = wx.Button(panel,label="Login",pos=(240, 60),size=(80, 50)        self.disconnect = wx.Button(panel,label="Login out",pos=(330,60),size=(80,50))
+        self.connect = wx.Button(panel,label="Login",pos=(240, 60),size=(80, 50)) 
+        self.disconnect = wx.Button(panel,label="Login out",pos=(330,60),size=(80,50))
         self.connect.Disable()
         self.disconnect.Disable()
         self.Bind(wx.EVT_BUTTON, self.OnDisconnect,self.disconnect)
