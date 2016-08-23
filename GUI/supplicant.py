@@ -1,3 +1,4 @@
+#Bugreport :lyq19961011@gmail.com
 import wx
 import threading
 from wx.py.shell import ShellFrame
@@ -17,7 +18,7 @@ class MyApp(wx.App):
     def OnInit(self):
        frame = MyFrame("Test", (500, 200), (500, 160))
        frame.Show()
-       self.SetTopWindow(frame) #set top windows,a app only have one top windows
+       self.SetTopWindow(frame)
        return True
     
 class MyFrame(wx.Frame):
@@ -34,14 +35,13 @@ class MyFrame(wx.Frame):
         menuFile.Append(3,"&Performance","host")
         menuFile.AppendSeparator() 
         menuFile.Append(2,"&Bug Report","Report a Bug to me")
-        
         menuFile2 = wx.Menu()
         menuFile2.Append(4,"&Python Shell","Open Python Shell frame")
         menuFile2.Append(5,"&Namespace Viewer","Open namespace viewer frame")
         menuBar = wx.MenuBar()
         menuBar.Append(menuFile, "&More")
         menuBar.Append(menuFile2,"&Debug")
-        self.SetMenuBar(menuBar) #Setting MenueBar and about python
+        self.SetMenuBar(menuBar)
         
         self.Bind(wx.EVT_MENU, self.OnAbout,id=1)
         self.Bind(wx.EVT_MENU,self.OnBugReport,id=2)
@@ -50,23 +50,21 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU,self.OnFilling,id=5)
         self.CreateStatusBar() 
         
-        self.SetStatusText("Welcome to use") #creat a StatusText and put text into 
+        self.SetStatusText("Welcome to use")
         
-        panel = wx.Panel(self) #redef panel
-        self.connect = wx.Button(panel,label="Login",pos=(240, 60),size=(50, 50))#creat a button with position size
-        self.disconnect = wx.Button(panel,label="Disconnect",pos=(300,60),size=(50,50))#creat another button
+        panel = wx.Panel(self) 
+        self.connect = wx.Button(panel,label="Login",pos=(240, 60),size=(80, 50)        self.disconnect = wx.Button(panel,label="Login out",pos=(330,60),size=(80,50))
         self.connect.Disable()
         self.disconnect.Disable()
-        self.Bind(wx.EVT_BUTTON, self.OnDisconnect,self.disconnect)   #bind button to even close
+        self.Bind(wx.EVT_BUTTON, self.OnDisconnect,self.disconnect)
         self.Bind(wx.EVT_BUTTON,self.OnConnect,self.connect)
-        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)  #bind even close even
-        
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)         
         wx.StaticText(panel, -1, "Username:", pos=(8, 40))
         self.username = wx.TextCtrl(panel, -1 ,pos=(80, 40))
         self.username.SetInsertionPoint(0)
         self.Bind(wx.EVT_TEXT,self.Onuser,self.username)
-        wx.StaticText(panel,-1,"Password:",pos=(182,40))
-        self.pwd = wx.TextCtrl(panel, -1,pos=(250,40),style=wx.TE_PASSWORD |wx.TE_PROCESS_ENTER)
+        wx.StaticText(panel,-1,"Password:",pos=(212,40))
+        self.pwd = wx.TextCtrl(panel, -1,pos=(280,40),style=wx.TE_PASSWORD |wx.TE_PROCESS_ENTER)
         self.Bind(wx.EVT_TEXT,self.Onpwd,self.pwd)
  
         
@@ -98,7 +96,7 @@ class MyFrame(wx.Frame):
             self.connect.Disable()
             self.disconnect.Enable()
             wx.MessageBox('Breathe thread open',message)
-            self.SetStatusText("Auth is right")
+            self.SetStatusText("Auth success")
             self.OnStartThread()
             
 
@@ -185,7 +183,7 @@ class MainFrame(wx.Frame):
 
 
     def __init__(self):
-        wx.Frame.__init__(self, None, title="Connect not right",pos=(545,200),size=(420,150))
+        wx.Frame.__init__(self, None, title="Connect fail",pos=(545,200),size=(420,150))
         self.panelOne = PanelOne(self)
         self.time2die = 5
   
@@ -241,6 +239,7 @@ class WorkerThread(threading.Thread):
                 breathe = packet.generate_breathe(self.mac, self.ip, self.session, self.index)
                 status = connect.breathe(self.sock, breathe, self.hosts)
                 if status == 0:
+                    stop()
                     break
                 else:
                     self.index += 3
