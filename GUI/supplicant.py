@@ -31,26 +31,20 @@ class MyFrame(wx.Frame):
         self.IP=''
         wx.Frame.__init__(self, None, -1, title, pos, size)
         menuFile = wx.Menu()
-        menuFile.Append(1, "&Help...","")
+        menuFile.Append(1, "&About...","Show about")
         menuFile.Append(3,"&Performance","host")
         menuFile.AppendSeparator() 
         menuFile.Append(2,"&Bug Report","Report a Bug to me")
-        menuFile2 = wx.Menu()
-        menuFile2.Append(4,"&Python Shell","Open Python Shell frame")
-        menuFile2.Append(5,"&Namespace Viewer","Open namespace viewer frame")
         menuBar = wx.MenuBar()
         menuBar.Append(menuFile, "&More")
-        menuBar.Append(menuFile2,"&Debug")
         self.SetMenuBar(menuBar)
         
         self.Bind(wx.EVT_MENU, self.OnAbout,id=1)
         self.Bind(wx.EVT_MENU,self.OnBugReport,id=2)
         hosts = self.Bind(wx.EVT_MENU,self.OnSet,id=3)
-        self.Bind(wx.EVT_MENU,self.OnShell,id=4)
-        self.Bind(wx.EVT_MENU,self.OnFilling,id=5)
         self.CreateStatusBar() 
         
-        self.SetStatusText("Welcome to use")
+        self.SetStatusText("Welcome to use !")
         
         panel = wx.Panel(self) 
         self.connect = wx.Button(panel,label="Login",pos=(240, 60),size=(80, 50)) 
@@ -121,7 +115,7 @@ class MyFrame(wx.Frame):
         return True
     
     def OnDisconnect(self, event):
-        msgbox = wx.MessageDialog(None, "",'Are you sure to login out',wx.YES_NO | wx.ICON_QUESTION)
+        msgbox = wx.MessageDialog(None, "",'Are you sure to login out ?',wx.YES_NO | wx.ICON_QUESTION)
         ret = msgbox.ShowModal()
         if (ret == wx.ID_YES):
             self.StopThreads()
@@ -136,18 +130,16 @@ class MyFrame(wx.Frame):
     def OnBugReport(self,event):
         wx.MessageBox("Gmail:lyq19961011@gmail.com","Welcome to report Bug",wx.OK | wx.ICON_INFORMATION,self)
 
-    def OnShell(self, event):
-        frame = ShellFrame(parent=self)
-        frame.Show()
 
-    def OnFilling(self, event):
-        frame = FillingFrame(parent=self)
-        frame.Show()
 
     def OnCloseWindow(self, event):
-        self.StopThreads()
-        self.Destroy()
-        sys.exit()
+        msgbox = wx.MessageDialog(None, "If you are online.You will login out",'Are you sure to close the window ?',wx.YES_NO | wx.ICON_QUESTION)
+        ret = msgbox.ShowModal()
+        if (ret == wx.ID_YES):
+            self.StopThreads()
+            time.sleep(0.5)
+            sys.exit()
+        
 
     def OnSet(self,event):
         windows=wx.TextEntryDialog(None, "host",'Perfermance', '210.45.194.10')
@@ -178,13 +170,13 @@ class PanelOne(wx.Panel):
     def __init__(self, parent):
         """Constructor"""
         wx.Panel.__init__(self, parent)
-        self.countdown = wx.StaticText(self, label="6seconds",pos=(160,60))
+        self.countdown = wx.StaticText(self, label="6seconds",pos=(178,60))
 
 class MainFrame(wx.Frame):
 
 
     def __init__(self):
-        wx.Frame.__init__(self, None, title="Connect fail",pos=(545,200),size=(420,150))
+        wx.Frame.__init__(self, None, title="Connect Failed",pos=(545,200),size=(420,150))
         self.panelOne = PanelOne(self)
         self.time2die = 5
   
