@@ -3,7 +3,7 @@
 基于Python的安腾小蝴蝶的全平台认证脚本，理论上可在windows、linux、osx、android、ios等可以安装python运行环境的系统下跑起。但目前属于测试阶段，可能会出现意想不到的错误，如果出错了，请告诉我：lyq19961011@gmail.com。  
 
 ##测试环境
-* OS X、windows、linux、android、（Openwrt暂未测试)
+* OS X、windows、linux、android、(Openwrt以测试，需要python运行环境，/overlay需要8m以上可用空间)
 * Python 2.7.x
 
 # AHNU用户：
@@ -17,9 +17,9 @@
  1、GUI的简直是BUG多的死。。。慢慢来吧
 
 ## release 0.1.x在osx、windows、linux下测试通过。  
-release 0.2.x是每次手动输入用户名和密码的，安全性较高...防止有人打开.py文件偷看你密码，是吧。。已在osx、windows、linux测试通过。
+release 0.2.x是每次手动输入用户名和密码的。已在osx、windows、linux测试通过。
   
-  关于我为什么要搞这两个版本：是为了脚本能方便的在Openwrt等的第三方路由器系统跑起来(暂未实现）。
+  关于我为什么要搞这两个版本：是为了脚本能方便的在Openwrt等的第三方路由器系统跑起来。
 
 
 ##0.1版 使用前的配置  
