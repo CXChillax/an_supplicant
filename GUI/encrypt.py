@@ -1,18 +1,4 @@
 #!/usr/bin/python
-import sys
-import socket
-import struct
-import urllib2
-import time
-import hashlib
-import uuid
-import get
-import encrypt
-import packet
-import connect
-import sys
-import socket
-import struct
 
 def encrypt(buffer):
 	for i in range(len(buffer)):

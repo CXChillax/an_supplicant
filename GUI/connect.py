@@ -1,8 +1,5 @@
 #!/usr/bin/python
 
-import sys
-import socket
-import time
 import encrypt
 import socket
 import struct
@@ -31,6 +28,7 @@ def breathe(sock, packet, host):
 	encrypt.decrypt(upnet_ret)
 	status2 = upnet_ret[20]
 	return status2
+
 def downnet(sock, packet, host):
 	sock.sendto(packet,(host,3848))
 	sock.close()
