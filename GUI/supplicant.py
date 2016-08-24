@@ -17,6 +17,8 @@ class MyApp(wx.App):
     
     def OnInit(self):
        frame = MyFrame("Test", (500, 200), (500, 160))
+       frame.SetMaxSize((500,160))
+       frame.SetMinSize((500,160))
        frame.Show()
        self.SetTopWindow(frame)
        return True
@@ -61,9 +63,6 @@ class MyFrame(wx.Frame):
         wx.StaticText(panel,-1,"Password:",pos=(212,40))
         self.pwd = wx.TextCtrl(panel, -1,pos=(280,40),style=wx.TE_PASSWORD |wx.TE_PROCESS_ENTER)
         self.Bind(wx.EVT_TEXT,self.Onpwd,self.pwd)
- 
-        
-        
         wx.CheckBox(panel, -1, "Auto Login", (20, 80), (150, 20))
         wx.CheckBox(panel, -1, "Save Password", (110, 80), (150, 20))
         
@@ -90,6 +89,8 @@ class MyFrame(wx.Frame):
         else:
             self.connect.Disable()
             self.disconnect.Enable()
+            self.username.SetEditable(False)
+            self.pwd.SetEditable(False)
             wx.MessageBox('Breathe thread open',message)
             self.SetStatusText("Auth success")
             self.OnStartThread()
@@ -232,7 +233,9 @@ class WorkerThread(threading.Thread):
                 breathe = packet.generate_breathe(self.mac, self.ip, self.session, self.index)
                 status = connect.breathe(self.sock, breathe, self.hosts)
                 if status == 0:
-                    stop()
+                    self.sock.close()
+                    wx.MessageBox("Keep Online Fail!!Program will exit","Wrong!!",wx.OK | wx.ICON_INFORMATION,self)
+                    sys.exit()
                     break
                 else:
                     self.index += 3
