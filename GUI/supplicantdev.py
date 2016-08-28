@@ -1,4 +1,5 @@
 #Bugreport :lyq19961011@gmail.com
+#-*-coding:utf-8-*-
 import wx
 import threading
 import get
@@ -13,7 +14,7 @@ import connect
 class MyApp(wx.App):
     
     def OnInit(self):
-       frame = MyFrame("Test", (500, 200), (500, 160))
+       frame = MyFrame("supplicant", (500, 200), (500, 160))
        frame.SetMaxSize((500,160))
        frame.SetMinSize((500,160))
        frame.Show()
@@ -30,37 +31,37 @@ class MyFrame(wx.Frame):
         self.IP=''
         wx.Frame.__init__(self, None, -1, title, pos, size)
         menuFile = wx.Menu()
-        menuFile.Append(1, "&About...","Show about")
-        menuFile.Append(3,"&Performance","host")
+        menuFile.Append(1, u"&关于...",u"关于本程序")
+        menuFile.Append(3,u"&偏好设置",u"设置服务器IP")
         menuFile.AppendSeparator() 
-        menuFile.Append(2,"&Bug Report","Report a Bug to me")
+        menuFile.Append(2,u"&Bug Report",u"报告长官，发现bug！")
         menuBar = wx.MenuBar()
-        menuBar.Append(menuFile, "&More")
+        menuBar.Append(menuFile, u"&更多")
         self.SetMenuBar(menuBar)
         self.Bind(wx.EVT_MENU, self.OnAbout,id=1)
         self.Bind(wx.EVT_MENU,self.OnBugReport,id=2)
         hosts = self.Bind(wx.EVT_MENU,self.OnSet,id=3)
         self.CreateStatusBar() 
         
-        self.SetStatusText("Welcome to use !")
+        self.SetStatusText(u"欢迎使用")
         
         panel = wx.Panel(self) 
-        self.connect = wx.Button(panel,label="Login",pos=(240, 60),size=(80, 50)) 
-        self.disconnect = wx.Button(panel,label="Login out",pos=(330,60),size=(80,50))
+        self.connect = wx.Button(panel,label=u"登录",pos=(240, 60),size=(80, 50)) 
+        self.disconnect = wx.Button(panel,label=u"下线",pos=(330,60),size=(80,50))
         self.connect.Disable()
         self.disconnect.Disable()
         self.Bind(wx.EVT_BUTTON, self.OnDisconnect,self.disconnect)
         self.Bind(wx.EVT_BUTTON,self.OnConnect,self.connect)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)         
-        wx.StaticText(panel, -1, "Username:", pos=(8, 40))
+        wx.StaticText(panel, -1, u"用户名:", pos=(28, 40))
         self.username = wx.TextCtrl(panel, -1 ,pos=(80, 40))
         self.username.SetInsertionPoint(0)
         self.Bind(wx.EVT_TEXT,self.Onuser,self.username)
-        wx.StaticText(panel,-1,"Password:",pos=(212,40))
+        wx.StaticText(panel,-1,u"密码:",pos=(242,40))
         self.pwd = wx.TextCtrl(panel, -1,pos=(280,40),style=wx.TE_PASSWORD |wx.TE_PROCESS_ENTER)
         self.Bind(wx.EVT_TEXT,self.Onpwd,self.pwd)
-        wx.CheckBox(panel, -1, "Auto Login", (20, 80), (150, 20))
-        wx.CheckBox(panel, -1, "Save Password", (110, 80), (150, 20))
+        wx.CheckBox(panel, -1, u"自动登录", (20, 80), (150, 20))
+        wx.CheckBox(panel, -1, u"保存密码", (110, 80), (150, 20))
         
 
    
@@ -87,8 +88,8 @@ class MyFrame(wx.Frame):
             self.disconnect.Enable()
             self.username.SetEditable(False)
             self.pwd.SetEditable(False)
-            wx.MessageBox('Breathe thread open',message)
-            self.SetStatusText("Authentication OK")
+            wx.MessageBox(u'呼吸线程开启',message)
+            self.SetStatusText(u"认证成功")
             self.OnStartThread()
             
 
@@ -112,25 +113,25 @@ class MyFrame(wx.Frame):
         return True
     
     def OnDisconnect(self, event):
-        msgbox = wx.MessageDialog(None, "",'Are you sure to login out ?',wx.YES_NO | wx.ICON_QUESTION)
+        msgbox = wx.MessageDialog(None, "",u'确定要下线吗？',wx.YES_NO | wx.ICON_QUESTION)
         ret = msgbox.ShowModal()
         if (ret == wx.ID_YES):
             self.StopThreads()
-            wx.MessageBox( "Progarm will exit",'\nYou have been login out,and breathe thread is stop')
+            wx.MessageBox( u"程序即将退出",u'\n下线了，呼吸线程关闭')
             sys.exit()
             
 
      
     def OnAbout(self, event):
-        wx.MessageBox("Dont try to use this to hack","About this Program", wx.OK | wx.ICON_INFORMATION, self) 
+        wx.MessageBox(u"程序属于测试阶段\n仅用于学习，禁止用来hack，以及损害他人利益",u"关于", wx.OK | wx.ICON_INFORMATION, self) 
 
     def OnBugReport(self,event):
-        wx.MessageBox("Gmail:lyq19961011@gmail.com","Welcome to report Bug",wx.OK | wx.ICON_INFORMATION,self)
+        wx.MessageBox("Gmail:lyq19961011@gmail.com",u"欢迎提交bug",wx.OK | wx.ICON_INFORMATION,self)
 
 
 
     def OnCloseWindow(self, event):
-        msgbox = wx.MessageDialog(None, "If you are online.You will login out",'Are you sure to close the window ?',wx.YES_NO | wx.ICON_QUESTION)
+        msgbox = wx.MessageDialog(None, u"如果你当前在线的话，退出将会导致下线",u'确定关闭窗口吗？',wx.YES_NO | wx.ICON_QUESTION)
         ret = msgbox.ShowModal()
         if (ret == wx.ID_YES):
             self.StopThreads()
@@ -139,7 +140,7 @@ class MyFrame(wx.Frame):
         
 
     def OnSet(self,event):
-        windows=wx.TextEntryDialog(None, "host",'Perfermance', '210.45.194.10')
+        windows=wx.TextEntryDialog(None, "host",u'偏好设置', '210.45.194.10')
         windows.Show()
         if windows.ShowModal() == wx.ID_OK:
             response = windows.GetValue()
@@ -167,13 +168,13 @@ class PanelOne(wx.Panel):
     def __init__(self, parent):
         """Constructor"""
         wx.Panel.__init__(self, parent)
-        self.countdown = wx.StaticText(self, label="6seconds",pos=(178,60))
+        self.countdown = wx.StaticText(self, label=u"请在6s后重试",pos=(178,60))
 
 class MainFrame(wx.Frame):
 
 
     def __init__(self):
-        wx.Frame.__init__(self, None, title="Connect Failed",pos=(545,200),size=(420,150))
+        wx.Frame.__init__(self, None, title=u"上线失败",pos=(545,200),size=(420,150))
         self.panelOne = PanelOne(self)
         self.time2die = 5
   
@@ -188,7 +189,7 @@ class MainFrame(wx.Frame):
     def update(self, event):
         
         if self.time2die > 0:
-            msg = "%sseconds" % self.time2die
+            msg = u"%ss后重试" % self.time2die
             self.panelOne.countdown.SetLabel(msg)
         else:
             self.Close()
@@ -229,7 +230,7 @@ class WorkerThread(threading.Thread):
                 status = connect.breathe(self.sock, breathe, self.hosts)
                 if status == 0:
                     self.sock.close()
-                    wx.MessageBox("Keep Online Fail!!Program will exit","Wrong!!",wx.OK | wx.ICON_INFORMATION,self)
+                    wx.MessageBox(u"保持在线失败！程序即将退出",u"错误!!",wx.OK | wx.ICON_INFORMATION,self)
                     sys.exit()
                     break
                 else:
