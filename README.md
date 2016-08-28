@@ -60,4 +60,11 @@ windows用户：下载python运行环境并配置正确。windows＋r，输入cm
 
 ##Future release demo:  
 安装wxpython框架，GUI测试版，跑起来了。  
+mac在打包前安装好py2app。  
+
+打包命令：  
+cd /GUI  
+py2applet --make-setup supplicant.py
+python setup.py py2app
+  
 
