@@ -1,4 +1,4 @@
-# 关于supplicant.py
+#关于supplicant.py
 项目主页：https://github.com/lyq1996/supplicant
 基于Python的安腾小蝴蝶的全平台认证脚本，理论上可在windows、linux、osx、android、ios等可以安装python运行环境的系统下跑起。但目前属于测试阶段，可能会出现意想不到的错误，如果出错了，请告诉我：lyq19961011@gmail.com。  
 
@@ -12,9 +12,6 @@
 
 # 其他学校的用户：
 如果你们学校校园网是蝴蝶，那么你完全可以用这个脚本去登录校园网,某些情况可能需要修改code，如果登录过程中出现错误，请你告诉我。
-
-# 已知bug：
- 1、GUI的简直是BUG多的死。。。慢慢来吧
 
 ## release 0.1.x在osx、windows、linux下测试通过。  
 release 0.2.x是每次手动输入用户名和密码的。已在osx、windows、linux测试通过。
