@@ -29,10 +29,11 @@ windows用户推荐使用Notepad＋＋打开下载的py文件
 
 安卓在使用前请下载Qpython。
 
+host = ' ' #在这里填上服务器的IP地址，打开windows下的蝴蝶，偏好设置里面有  
 
-username = '' #在这里填上你的用户名
+username = ' ' #在这里填上你的用户名
 
-password = '' #在这里填上你的密码
+password = ' ' #在这里填上你的密码
 
 
 ##0.1版 运行步骤:  
@@ -53,7 +54,8 @@ windows用户：下载python运行环境并配置正确。windows＋r，输入cm
 如果终端显示permission deined：输入 chmod 755 .py文件拖进去，回车即可
 
 ##0.2版 运行步骤:  
-和0.1一样，拖进去就行了...但使用前什么都不用改
+host = ' ' #填上你的服务器认证ip  
+然后运行就行了...不需要填写Mac地址、IP、用户名、密码  
 
 ##Future release demo:  
 安装wxpython框架，GUI测试版，跑起来了。  
