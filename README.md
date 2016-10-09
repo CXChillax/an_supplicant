@@ -1,9 +1,9 @@
 #关于supplicant.py
-项目主页：https://github.com/lyq1996/supplicant
+项目主页：https://github.com/lyq1996/supplicant  
 基于Python的安腾小蝴蝶的全平台认证脚本，理论上可在windows、linux、osx、android、ios等可以安装python运行环境的系统下跑起。但目前属于测试阶段，可能会出现意想不到的错误，如果出错了，请告诉我：lyq19961011@gmail.com。  
 
 ##测试环境
-* OS X、windows、linux、android、(Openwrt以测试，需要python运行环境，/overlay需要8m以上可用空间)
+* OS X、windows、linux、android、(Open-wrt以测试，需要python运行环境，/overlay需要8m以上可用空间)
 * Python 2.7.x
 
 # AHNU用户：
@@ -53,7 +53,7 @@ windows用户：下载python运行环境并配置正确。windows＋r，输入cm
 
 如果终端显示permission deined：输入 chmod 755 .py文件拖进去，回车即可
 
-##0.2版 运行步骤:  
+##0.2版:  
 host = ' ' #填上你的服务器认证ip  
 然后运行就行了...不需要填写Mac地址、IP、用户名、密码  
 
