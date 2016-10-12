@@ -1,10 +1,8 @@
 #!/usr/bin/python
-# -*- coding utf-8 -*-
 # bugreport:lyq19961011@gmail.com
 import sys
 import socket
 import struct
-import urllib2
 import time
 import hashlib
 import getpass
@@ -160,6 +158,8 @@ def input_():
     return username,password
 
 def main():
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
     mac_address = get_mac_address()
     ip = Get_local_ip()
     host = gethost()
