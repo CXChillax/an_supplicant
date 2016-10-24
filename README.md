@@ -1,65 +1,46 @@
 #关于supplicant.py
 项目主页：https://github.com/lyq1996/supplicant  
-基于Python的安腾小蝴蝶的全平台认证脚本，理论上可在windows、linux、osx、android、ios等可以安装python运行环境的系统下跑起。但目前属于测试阶段，可能会出现意想不到的错误，如果出错了，请告诉我：lyq19961011@gmail.com。  
+基于Python的安腾小蝴蝶的全平台认证脚本
 
 ##测试环境
 * OS X、windows、linux、android、(Open-wrt以测试，需要python运行环境，/overlay需要8m以上可用空间)
 * Python 2.7.x
 
 # AHNU用户：
-方案：内网认证使用mentohust，外网用本python脚本。已在linux，windows，os x下测试通过。
+Linux登录校园网方案：内网认证使用mentohust，外网用本python脚本。已在linux，windows，os x下测试通过。
 
 
 # 其他学校的用户：
-如果你们学校校园网是蝴蝶，那么你完全可以用这个脚本去登录校园网,某些情况可能需要修改code，如果登录过程中出现错误，请你告诉我。
-
-## release 0.1.x在osx、windows、linux下测试通过。  
-release 0.2.x是每次手动输入用户名和密码的。已在osx、windows、linux测试通过。
-  
-  关于我为什么要搞这两个版本：是为了脚本能方便的在Openwrt等的第三方路由器系统跑起来。
+如果你们学校校园网是蝴蝶，那么你完全可以用这个脚本去登录校园网，多试试参数。
 
 
-##0.1版 使用前的配置  
-使用前请配置Python2.7.x，对于一些自带Python3.5的linux发行版本用户请自行配置2.7，否则会报错。  
-在程序打开前必须先打开.py文件进行用户名，密码的填写。  
+##使用前的配置  
+使用前请配置Python2.7.x，对于一些自带Python3.5的linux发行版本用户请自行配置2.7。  
+在程序打开前必须先打开.py文件进行用户名，密码等参数的填写。（具体看注释）  
 
-Mac用户推荐使用coderunner打开下载的py文件  
-
-windows用户推荐使用Notepad＋＋打开下载的py文件  
-
-安卓在使用前请下载Qpython。
-
-host = ' ' #在这里填上服务器的IP地址，打开windows下的蝴蝶，偏好设置里面有  
-
-username = ' ' #在这里填上你的用户名
-
-password = ' ' #在这里填上你的密码
+安卓在使用前下载Qpython。
 
 
-##0.1版 运行步骤:  
+##运行步骤:  
 注意：在你运行之前，请确保上一步的配置参数都已填写正确  
 上线：  
-Mac用户：打开终端，把py文件拖到终端里，回车。
+Mac用户：打开终端，把py文件拖到终端里运行。
 
 Linux用户：下载python运行环境，随后步骤同Mac。
 
-windows用户：下载python运行环境并配置正确。windows＋r，输入cmd，回车，把脚本拖入cmd，回车。或者双击.py文件。    
+windows用户：下载python运行环境并配置正确，拖入cmd中。  
 
 下线：  
-输入ctrl＋C
+ctrl＋C
 
 ##一些注意事项  
-使用时请看好你的网卡mac地址和程序显示的是否一致，以及ip是否是当前网卡上的。  
+使用时请看好你的物理网卡mac地址，以及ip是否是当前网卡上的。  
 
-如果终端显示permission deined：输入 chmod 755 .py文件拖进去，回车即可
-
-##0.2版:  
-host = ' ' #填上你的服务器认证ip  
-然后运行就行了...不需要填写Mac地址、IP、用户名、密码  
+如果终端显示permission deined：请chmod 755 .py文件拖进去，回车即可。  
 
 ##Future release demo:  
-安装wxpython框架，GUI测试版，跑起来了。  
-mac在打包前安装好py2app。  
+安装wxpython框架，GUI界面测试版，跑起来了。  
+mac在打包前需要安装好py2app。  
 
 打包命令：  
 cd /GUI  
