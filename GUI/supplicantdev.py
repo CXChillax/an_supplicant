@@ -29,6 +29,7 @@ class MyFrame(wx.Frame):
         self.getsession = []
         self.MAC=''
         self.IP=''
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         wx.Frame.__init__(self, None, -1, title, pos, size)
         menuFile = wx.Menu()
         menuFile.Append(1, u"&关于...",u"关于本程序")
@@ -75,10 +76,11 @@ class MyFrame(wx.Frame):
         ip = get.Get_local_ip()
         self.IP=ip
         upnet_net = packet.generate_upnet(mac, ip, Username, Password)
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock=self.s
         hosts = '210.45.194.10'
         status,message= connect.upnet(sock, upnet_net, hosts,self.getsession)
         if status == 0:
+            sock.close
             msgbox = wx.MessageDialog(None, "",message,wx.OK)
             msgbox.ShowModal()
             frame=MainFrame()
@@ -117,13 +119,14 @@ class MyFrame(wx.Frame):
         ret = msgbox.ShowModal()
         if (ret == wx.ID_YES):
             self.StopThreads()
+            #self.connect.Enable()
             wx.MessageBox( u"程序即将退出",u'\n下线了，呼吸线程关闭')
             sys.exit()
             
 
      
     def OnAbout(self, event):
-        wx.MessageBox(u"程序属于测试阶段\n仅用于学习，禁止用来hack，以及损害他人利益",u"关于", wx.OK | wx.ICON_INFORMATION, self) 
+        wx.MessageBox(u"程序属于测试阶段\n仅用于学习，禁止用来攻击，以及损害他人利益",u"关于", wx.OK | wx.ICON_INFORMATION, self) 
 
     def OnBugReport(self,event):
         wx.MessageBox("Gmail:lyq19961011@gmail.com",u"欢迎提交bug",wx.OK | wx.ICON_INFORMATION,self)
@@ -149,7 +152,7 @@ class MyFrame(wx.Frame):
         windows.Destroy()
     
     def OnStartThread(self):
-        thread = WorkerThread(self.MAC, self.IP, self.getsession, self)
+        thread = WorkerThread(self.MAC, self.IP, self.getsession,self.s, self)
         self.threads.append(thread)
         thread.start()
 
@@ -200,15 +203,15 @@ class MainFrame(wx.Frame):
 
 class WorkerThread(threading.Thread):
     
-    def __init__(self, mac, ip, session, window):
+    def __init__(self, mac, ip, session, sock, window):
         threading.Thread.__init__(self)
         self.session=session
         self.index=0x01000000
         self.mac=mac
         self.ip=ip
+        self.sock=sock
         self.window=window
         self.hosts='210.45.194.10'
-        self.sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.threadNum = 1
         self.timeToQuit = threading.Event()
         self.timeToQuit.clear()
@@ -220,7 +223,7 @@ class WorkerThread(threading.Thread):
         self.timeToQuit.set()
     
     def run(self):
-         self.timeToQuit.wait(10)
+         self.timeToQuit.wait(0)
          while True:
             if self.timeToQuit.isSet():
                 self.sock.close()
