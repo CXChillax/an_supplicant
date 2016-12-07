@@ -38,13 +38,19 @@ ctrl＋C
 
 如果终端显示permission deined：请chmod 755 .py文件拖进去，回车即可。  
 
-##Future release demo:  
+##GUI version:  
 安装wxpython框架，GUI界面测试版，跑起来了。  
 mac在打包前需要安装好py2app。  
 
 打包命令：  
 cd /GUI  
 py2applet --make-setup supplicant.py
-python setup.py py2app
+python setup.py py2app  
+
+*自动保存用户名及密码  
+*无限制共享  
+*比官方蝴蝶快N倍  
+Release里面有三个版本：  
+Mac OS、Ubuntu、Windows  都已测试。
   
 
