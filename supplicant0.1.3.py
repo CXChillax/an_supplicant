@@ -28,10 +28,10 @@ def login(sock, packet, message_display):
     session_len = response[22]
     session = response[23:session_len + 23]
     message_len = response[response.index(11,35)+1]
-    message = response[response.index(11,35)+2:message_len+response.index(11,35)+2]
-    message = ''.join([struct.pack('B', i) for i in message]).decode('gbk')
+    message = response[response.index(11,35)+2:message_len+response.index(11,35)+2]    
     if login_status == 0:
         if message_display == '1':
+            message = ''.join([struct.pack('B', i) for i in message]).decode('gbk')
             print message
             sock.close()
             sys.exit()
@@ -41,6 +41,7 @@ def login(sock, packet, message_display):
             sys.exit()
 
     elif message_display == '1':
+        message = ''.join([struct.pack('B', i) for i in message]).decode('gbk')
         print message
         return session
     else:
@@ -154,7 +155,11 @@ def generate_downnet(mac, ip, session, index, block):
 def decode():
     reload(sys)
     sys.setdefaultencoding('utf-8')
-    
+
+
+def delay():
+    time.sleep(60)
+
 def main():
     decode()
     host = define_host()
@@ -166,7 +171,9 @@ def main():
     dhcp_setting = '0'   #是否开启DHCP自分配IP地址,'1'或'0' 
     service = 'int'     #服务设置,例如'int','internet'
     message_display = '1' #是否显示服务器返回的消息,'1'或'0' 
-    
+    delay_enabled = '0'  #是否设置延迟选项，Only for Openwrt
+    if delay_enabled ='1':
+        delay()
     print str('Ctrl + C to exit\nMAC:'),mac_address,str('\nHOST:'),host,str('\nIP:'),ip
     index = 0x01000000
     block = [0x2a, 0x06, 0, 0, 0, 0, 0x2b, 0x06, 0, 0, 0, 0, 0x2c, 0x06, 0, 0, 0, 0, 0x2d, 0x06, 0, 0, 0, 0, 0x2e, 0x06, 0, 0, 0, 0, 0x2f, 0x06, 0, 0, 0, 0]
