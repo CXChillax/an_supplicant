@@ -172,12 +172,11 @@ def main():
     service = 'int'     #服务设置,例如'int','internet'
     message_display = '1' #是否显示服务器返回的消息,'1'或'0' 
     delay_enabled = '0'  #是否设置延迟选项，Only for Openwrt
-    if delay_enabled ='1':
+    if delay_enabled =='1':
         delay()
     print str('Ctrl + C to exit\nMAC:'),mac_address,str('\nHOST:'),host,str('\nIP:'),ip
     index = 0x01000000
     block = [0x2a, 0x06, 0, 0, 0, 0, 0x2b, 0x06, 0, 0, 0, 0, 0x2c, 0x06, 0, 0, 0, 0, 0x2d, 0x06, 0, 0, 0, 0, 0x2e, 0x06, 0, 0, 0, 0, 0x2f, 0x06, 0, 0, 0, 0]
-    
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(10)
     upnet_packet = generate_upnet(mac_address, username, password,  ip, dhcp_setting, service, version)
