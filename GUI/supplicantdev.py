@@ -9,88 +9,102 @@ import socket
 import struct
 import time
 import connect
+import confrw
+import os
 
-
-class MyApp(wx.App):
+class MainApp(wx.App):
     
     def OnInit(self):
-       frame = MyFrame("supplicant", (500, 200), (500, 160))
-       frame.SetMaxSize((500,160))
-       frame.SetMinSize((500,160))
+       frame = SupplicantFrame("supplicant", (520, 200), (450, 160))
+       frame.SetMaxSize((450,160))
+       frame.SetMinSize((450,160))
        frame.Show()
        self.SetTopWindow(frame)
        return True
     
-class MyFrame(wx.Frame):
+class SupplicantFrame(wx.Frame):
     
     def __init__(self, title, pos, size):
-
+        self.updateconf()
         self.threads = []
         self.getsession = []
         self.MAC=''
         self.IP=''
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         wx.Frame.__init__(self, None, -1, title, pos, size)
         menuFile = wx.Menu()
         menuFile.Append(1, u"&关于...",u"关于本程序")
-        menuFile.Append(3,u"&偏好设置",u"设置服务器IP")
+        menuFile.Append(3,u"&偏好设置",u"偏好设置")
         menuFile.AppendSeparator() 
-        menuFile.Append(2,u"&Bug Report",u"报告长官，发现bug！")
+        menuFile.Append(2,u"&Bug Report",u"！！")
         menuBar = wx.MenuBar()
         menuBar.Append(menuFile, u"&更多")
-        self.SetMenuBar(menuBar)
+        self.SetMenuBar(menuBar)       
         self.Bind(wx.EVT_MENU, self.OnAbout,id=1)
         self.Bind(wx.EVT_MENU,self.OnBugReport,id=2)
-        hosts = self.Bind(wx.EVT_MENU,self.OnSet,id=3)
+        setting = self.Bind(wx.EVT_MENU,self.OnSet,id=3)
         self.CreateStatusBar() 
-        
         self.SetStatusText(u"欢迎使用")
-        
         panel = wx.Panel(self) 
-        self.connect = wx.Button(panel,label=u"登录",pos=(240, 60),size=(80, 50)) 
-        self.disconnect = wx.Button(panel,label=u"下线",pos=(330,60),size=(80,50))
+        self.connect = wx.Button(panel,label=u"登录",pos=(58, 86),size=(80, 25)) 
+        self.disconnect = wx.Button(panel,label=u"下线",pos=(142,86),size=(80,25))
         self.connect.Disable()
         self.disconnect.Disable()
         self.Bind(wx.EVT_BUTTON, self.OnDisconnect,self.disconnect)
         self.Bind(wx.EVT_BUTTON,self.OnConnect,self.connect)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)         
-        wx.StaticText(panel, -1, u"用户名:", pos=(28, 40))
-        self.username = wx.TextCtrl(panel, -1 ,pos=(80, 40))
+        wx.StaticText(panel, -1, u"用户名:", pos=(58, 40))
+        self.username = wx.TextCtrl(panel, -1 ,self.u,pos=(110, 40))
         self.username.SetInsertionPoint(0)
         self.Bind(wx.EVT_TEXT,self.Onuser,self.username)
-        wx.StaticText(panel,-1,u"密码:",pos=(242,40))
-        self.pwd = wx.TextCtrl(panel, -1,pos=(280,40),style=wx.TE_PASSWORD |wx.TE_PROCESS_ENTER)
+        wx.StaticText(panel,-1, u"密码:",pos=(232,40))
+       
+        self.pwd = wx.TextCtrl(panel, -1, self.p , pos=(270,40),style=wx.TE_PASSWORD |wx.TE_PROCESS_ENTER)
+
         self.Bind(wx.EVT_TEXT,self.Onpwd,self.pwd)
-        wx.CheckBox(panel, -1, u"自动登录", (20, 80), (150, 20))
-        wx.CheckBox(panel, -1, u"保存密码", (110, 80), (150, 20))
-        
+        self.setting = wx.Button(panel,label=u"设置",pos=(232, 86),size=(80, 25))
+        self.Bind(wx.EVT_BUTTON, self.OnSet,self.setting)
+        self.About = wx.Button(panel,label=u"关于",pos=(316, 86),size=(80, 25))
+        self.Bind(wx.EVT_BUTTON, self.OnAbout,self.About)
+        self._EnableOrDisableOkBtn()
+
 
    
         
-    
+    def updateconf(self):
+        self.a=confrw.confread()
+        self.u = self.a[0]
+        self.p = self.a[1]
+        self.host = self.a[2]    
+        self.ver=self.a[3]
+        self.ser=self.a[4]
+   
+ 
     def OnConnect(self,event):
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         Username = self.username.GetValue()
         Password = self.pwd.GetValue()
         mac = get.get_mac_address()
         self.MAC=mac
         ip = get.Get_local_ip()
         self.IP=ip
-        upnet_net = packet.generate_upnet(mac, ip, Username, Password)
-        sock=self.s
-        hosts = '210.45.194.10'
-        status,message= connect.upnet(sock, upnet_net, hosts,self.getsession)
+        service=self.ser
+        version=self.ver
+        upnet_net = packet.generate_upnet(self.MAC, self.IP, Username, Password, service, version)
+        hosts = self.host
+        status,message= connect.upnet(sock, upnet_net, hosts, self.getsession)
         if status == 0:
+            self.getsession=[]
             sock.close
-            msgbox = wx.MessageDialog(None, "",message,wx.OK)
-            msgbox.ShowModal()
-            frame=MainFrame()
-            frame.Show()
+            msgbox = wx.MessageBox(message)
+            #frame=ErrorFrame()
+            #frame.Show()
         else:
             self.connect.Disable()
+            self.setting.Disable()
             self.disconnect.Enable()
             self.username.SetEditable(False)
             self.pwd.SetEditable(False)
-            wx.MessageBox(u'呼吸线程开启',message)
+            wx.MessageBox(message)
             self.SetStatusText(u"认证成功")
             self.OnStartThread()
             
@@ -107,6 +121,8 @@ class MyFrame(wx.Frame):
         self.connect.Disable()
         usrStr = self.username.GetValue()
         pwdStr = self.pwd.GetValue()
+        confrw.confwriteu(usrStr)
+        confrw.confwritep(pwdStr)
         if not usrStr=='' and not pwdStr=='':
             self.connect.Enable()
             self.Bind(wx.EVT_TEXT_ENTER,self.OnConnect,self.pwd)                    
@@ -115,22 +131,27 @@ class MyFrame(wx.Frame):
         return True
     
     def OnDisconnect(self, event):
-        msgbox = wx.MessageDialog(None, "",u'确定要下线吗？',wx.YES_NO | wx.ICON_QUESTION)
+        msgbox = wx.MessageDialog(None, u'确定下线吗？',u"!",wx.YES_NO | wx.ICON_QUESTION)
         ret = msgbox.ShowModal()
         if (ret == wx.ID_YES):
+            self.username.SetEditable(True)
+            self.pwd.SetEditable(True)
             self.StopThreads()
-            #self.connect.Enable()
-            wx.MessageBox( u"程序即将退出",u'\n下线了，呼吸线程关闭')
-            sys.exit()
+            self.connect.Enable()
+            self.setting.Enable()
+	    self.disconnect.Disable()
+	    self.getsession = []
+	    self.SetStatusText(u"已下线！")
+            #wx.MessageBox( u"程序即将退出",u'下线了，呼吸线程关闭')
+            #sys.exit()
             
 
      
     def OnAbout(self, event):
-        wx.MessageBox(u"程序属于测试阶段\n仅用于学习，禁止用来攻击，以及损害他人利益",u"关于", wx.OK | wx.ICON_INFORMATION, self) 
+        wx.MessageBox(u"test~",u"关于", wx.OK | wx.ICON_INFORMATION, self) 
 
     def OnBugReport(self,event):
-        wx.MessageBox("Gmail:lyq19961011@gmail.com",u"欢迎提交bug",wx.OK | wx.ICON_INFORMATION,self)
-
+        wx.MessageBox("Gmail:lyq19961011@gmail.com",u"欢迎提交bug",wx.OK | wx.ICON_INFORMATION,self)		
 
 
     def OnCloseWindow(self, event):
@@ -143,16 +164,28 @@ class MyFrame(wx.Frame):
         
 
     def OnSet(self,event):
-        windows=wx.TextEntryDialog(None, "host",u'偏好设置', '210.45.194.10')
-        windows.Show()
-        if windows.ShowModal() == wx.ID_OK:
-            response = windows.GetValue()
+
+        self.updateconf()
+        windows=TextEntryDialog(None,u'偏好设置',u'服务器IP',u'服务类型(int or internet)',u'客户端版本号设置')
+	windows.SetValue(self.host,self.ver,self.ser)
+        windows.Show()     
+	if windows.ShowModal() == wx.ID_OK:
+            response1 = windows.GetValue1()
+  	    response2 = windows.GetValue2()
+	    response3 = windows.GetValue3()
+            confrw.confwriteh(response1)
+	    confrw.confwritev(response2)
+	    confrw.confwrites(response3)
         else:
-            response = windows.GetValue()
+            windows.Destroy()
+            self.updateconf()
         windows.Destroy()
+        self.updateconf()
     
+   
+
     def OnStartThread(self):
-        thread = WorkerThread(self.MAC, self.IP, self.getsession,self.s, self)
+        thread = WorkerThread(self.MAC, self.IP, self.host, self.getsession, self)
         self.threads.append(thread)
         thread.start()
 
@@ -164,6 +197,52 @@ class MyFrame(wx.Frame):
             self.threads.remove(thread)
     
 
+class TextEntryDialog(wx.Dialog):
+    def __init__(self, parent, title, caption, caption2, caption3):
+        style = wx.DEFAULT_DIALOG_STYLE
+        super(TextEntryDialog, self).__init__(parent, -1, title, style=style,pos=(620,180))
+
+        text = wx.StaticText(self, -1, caption)
+        input = wx.TextCtrl(self, -1)
+        input.SetInitialSize((100, 20))
+
+        text2 = wx.StaticText(self, -1, caption2)
+        input2 = wx.TextCtrl(self, -1)
+        input2.SetInitialSize((100, 20))
+
+        text3 = wx.StaticText(self, -1, caption3)
+        input3 = wx.TextCtrl(self, -1)
+        input3.SetInitialSize((100, 20))
+
+        buttons = self.CreateButtonSizer(wx.OK|wx.CANCEL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(text, 0, wx.ALL, 5)
+        sizer.Add(input, 1, wx.ALL, 5)
+	sizer.Add(text2,0, wx.ALL, 5)
+	sizer.Add(input2,1, wx.ALL, 5)
+	sizer.Add(text3,0, wx.ALL, 5)
+	sizer.Add(input3,1, wx.ALL, 5)
+        sizer.Add(buttons, 0, wx.ALL, 5)
+        self.SetSizerAndFit(sizer)
+        self.input = input
+	self.input2 = input2
+	self.input3 = input3
+	
+
+    def SetValue(self, value1, value2, value3):
+        self.input.SetValue(value1)
+	self.input2.SetValue(value2)
+	self.input3.SetValue(value3)
+
+    def GetValue1(self):
+        return self.input.GetValue()
+
+    def GetValue2(self):
+	return self.input2.GetValue()
+
+    def GetValue3(self):
+	return self.input3.GetValue()
+	  
 
 class PanelOne(wx.Panel):
 
@@ -171,13 +250,14 @@ class PanelOne(wx.Panel):
     def __init__(self, parent):
         """Constructor"""
         wx.Panel.__init__(self, parent)
+       
         self.countdown = wx.StaticText(self, label=u"请在6s后重试",pos=(178,60))
 
-class MainFrame(wx.Frame):
+class ErrorFrame(wx.Frame):
 
 
     def __init__(self):
-        wx.Frame.__init__(self, None, title=u"上线失败",pos=(545,200),size=(420,150))
+        wx.Frame.__init__(self, None, title=u"上线失败",pos=(520,200),size=(420,150))
         self.panelOne = PanelOne(self)
         self.time2die = 5
   
@@ -192,7 +272,7 @@ class MainFrame(wx.Frame):
     def update(self, event):
         
         if self.time2die > 0:
-            msg = u"%ss后重试" % self.time2die
+            msg = u"请在%ss后重试" % self.time2die
             self.panelOne.countdown.SetLabel(msg)
         else:
             self.Close()
@@ -203,15 +283,15 @@ class MainFrame(wx.Frame):
 
 class WorkerThread(threading.Thread):
     
-    def __init__(self, mac, ip, session, sock, window):
+    def __init__(self, mac, ip, host, session, window):
         threading.Thread.__init__(self)
         self.session=session
         self.index=0x01000000
         self.mac=mac
         self.ip=ip
-        self.sock=sock
+        self.sock=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.window=window
-        self.hosts='210.45.194.10'
+        self.hosts= host
         self.threadNum = 1
         self.timeToQuit = threading.Event()
         self.timeToQuit.clear()
@@ -221,10 +301,13 @@ class WorkerThread(threading.Thread):
         downnet = packet.generate_downnet(self.mac,self.ip,self.session,self.index)
         connect.downnet(self.sock, downnet,self.hosts)
         self.timeToQuit.set()
+	self.index=0x01000000
     
     def run(self):
          self.timeToQuit.wait(0)
+	 #print self.session
          while True:
+	    #print self.index
             if self.timeToQuit.isSet():
                 self.sock.close()
                 break
@@ -237,13 +320,15 @@ class WorkerThread(threading.Thread):
                     sys.exit()
                     break
                 else:
+		    #print self.index
                     self.index += 3
                     self.timeToQuit.wait(self.messageDelay) 
             
         
 def main():
-    app = MyApp()
+    app = MainApp()
     app.MainLoop()
+
     
 if __name__ == '__main__':
     main()

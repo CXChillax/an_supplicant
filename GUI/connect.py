@@ -16,9 +16,12 @@ def upnet(sock, packet, host, getsession):
 	message_len = upnet_ret[upnet_ret.index(11,35)+1]
 	message = upnet_ret[upnet_ret.index(11,35)+2:message_len+upnet_ret.index(11,35)+2]
 	message = ''.join([struct.pack('B', i) for i in message]).decode('gbk')
-	for i in session:
-		getsession.append(i)
-	return status2,message
+	if status2==0:
+		getsession=[]
+	else:
+	        for i in session:
+		        getsession.append(i)
+        return status2,message
 
 	
 def breathe(sock, packet, host):

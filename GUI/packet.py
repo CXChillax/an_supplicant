@@ -4,10 +4,10 @@ import hashlib
 import encrypt
 import struct
 
-def generate_upnet(mac, ip, user, pwd):
+def generate_upnet(mac, ip, user, pwd, service, version):
 	packet = []
 	packet.append(1)
-	packet_len = len(user) + len(pwd) + 60
+	packet_len = 39 + len(user)  + len(pwd)  + len(ip)  + len(service)  + len(version)
 	packet.append(packet_len)
 	packet.extend([i * 0 for i in range(16)])
 	packet.extend([7, 8])
@@ -18,7 +18,11 @@ def generate_upnet(mac, ip, user, pwd):
 	packet.extend([ord(i) for i in pwd])
 	packet.extend([9, len(ip) + 2])
 	packet.extend([ord(i) for i in ip])
-	packet.extend([10, 5, 105, 110, 116, 14, 3, 1, 31, 7, 51, 46, 54, 46, 53])
+        packet.extend([10, len(service)+2])
+        packet.extend([ord(i) for i in service])
+   	packet.extend([14, 3, 1])
+        packet.extend([0x1f, len(version)+2])
+        packet.extend([ord(i) for i in version])
 	md5 = hashlib.md5(''.join([struct.pack('B', i) for i in packet])).digest()
 	packet[2:18] = struct.unpack('16B', md5)
 	encrypt.encrypt(packet)
