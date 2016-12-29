@@ -14,14 +14,13 @@ def get_text_file(filename):
 filename = r'conf.ini'
 if os.path.exists(filename):
     b=get_text_file(filename)
-    if "username" in b and "password" in b and "host" in b and "version" in b and "services" in b:
+    if "username" in b and "password" in b and "host" in b and "version" in b and "services" in b and "savepassword" in b:
         supplicantdev.main()
     #os.remove(filename)
     else:
         confrw.confcr()
         supplicantdev.main()
 else:
-
     confrw.confcr()
     supplicantdev.main()
 
