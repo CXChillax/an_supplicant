@@ -47,10 +47,9 @@ cd /GUI
 py2applet --make-setup supplicant.py
 python setup.py py2app  
 
-*自动保存用户名及密码  
 *无限制共享  
 *比官方蝴蝶快N倍  
-Release里面有三个版本：  
-Mac OS、Ubuntu、Windows  都已测试。
+Release里面是Windows版的：  
+Mac OS、Ubuntu、Windows  都已测试，改天会上传其他两个系统的。
   
 
