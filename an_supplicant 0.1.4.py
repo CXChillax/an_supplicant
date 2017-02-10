@@ -1,6 +1,6 @@
-#!/usr/bin/python
-#-*-coding:utf-8-*-
-# 如果遇到中文不能显示中文，请删除所有中文，并设置不显示服务器消息
+# !/usr/bin/python
+# -*-coding:utf-8-*-
+# 如果不能显示中文，请删除所有中文，并设置不显示服务器消息
 # bugreport:lyq19961011@gmail.com
 import sys
 import socket
@@ -27,7 +27,7 @@ def login(host, sock, packet, message_display):
         message = response[response.index(
             11, 35) + 2:message_len + response.index(11, 35) + 2]
         if login_status == 0:
-            if message_display == '1':
+            if message_display == 1:
                 message = ''.join([struct.pack('B', i)
                                    for i in message]).decode('gbk')
                 print message
@@ -45,53 +45,50 @@ def login(host, sock, packet, message_display):
         else:
             print str('Login success')
             return session
-    except socket.timeout or socket.error:
-        netcon = '0'
-        return netcon
+    except socket.error:
+        return False
 
 
-def breathe(host, sock, mac_address, ip, session, index, block):
+def breathe(host, sock, mac_address, ip_addr, session, index, block):
     time.sleep(0)
     while True:
         breathe_packet = generate_breathe(
-            mac_address, ip, session, index, block)
+            mac_address, ip_addr, session, index, block)
         send_data(host, sock, breathe_packet)
         try:
             breathe_response = sock.recv(3848)
-        except socket.timeout or socket.error:
-            netcon = '0'
-            return netcon
+        except socket.timeout:
+            return False
         else:
             breathe_status = struct.unpack(
                 'B' * len(breathe_response), breathe_response)
             if breathe_status[20] == 0:
-                sock.close()
-                sys.exit()
+                return False
             index += 3
             try:
                 time.sleep(30)
             except KeyboardInterrupt:
                 downnet_packet = generate_downnet(
-                    mac_address, ip, session, index, block)
+                    mac_address, ip_addr, session, index, block)
                 send_data(host, sock, downnet_packet)
                 print str('\n'), str('Downnet success.')
                 sock.close()
                 sys.exit()
 
 
-def encrypt(buffer):
-    for i in range(len(buffer)):
-        buffer[i] = (buffer[i] & 0x80) >> 6 | (buffer[i] & 0x40) >> 4 | (buffer[i] & 0x20) >> 2 | (buffer[i] & 0x10) << 2 | (
-            buffer[i] & 0x08) << 2 | (buffer[i] & 0x04) << 2 | (buffer[i] & 0x02) >> 1 | (buffer[i] & 0x01) << 7
+def encrypt(packet):
+    for i in packet:
+        i = (i & 0x80) >> 6 | (i & 0x40) >> 4 | (i & 0x20) >> 2 | (i & 0x10) << 2 | (
+            i & 0x08) << 2 | (i & 0x04) << 2 | (i & 0x02) >> 1 | (i & 0x01) << 7
 
 
-def decrypt(buffer):
-    for i in range(len(buffer)):
-        buffer[i] = (buffer[i] & 0x80) >> 7 | (buffer[i] & 0x40) >> 2 | (buffer[i] & 0x20) >> 2 | (buffer[i] & 0x10) >> 2 | (
-            buffer[i] & 0x08) << 2 | (buffer[i] & 0x04) << 4 | (buffer[i] & 0x02) << 6 | (buffer[i] & 0x01) << 1
+def decrypt(packet):
+    for i in packet:
+        i = (i & 0x80) >> 7 | (i & 0x40) >> 2 | (i & 0x20) >> 2 | (i & 0x10) >> 2 | (
+            i & 0x08) << 2 | (i & 0x04) << 4 | (i & 0x02) << 6 | (i & 0x01) << 1
 
 
-def generate_upnet(mac, user, pwd,  ip, dhcp, service, version):
+def generate_upnet(mac, user, pwd, ip, dhcp, service, version):
     packet = []
     packet.append(0x01)
     packet_len = 38 + len(user) + len(pwd) + len(ip) + \
@@ -201,24 +198,25 @@ def main():
     sock.settimeout(5)
     while True:
         upnet_packet = generate_upnet(
-            mac_address, username, password,  ip, dhcp_setting, service, version)
+            mac_address, username, password, ip, dhcp_setting, service, version)
         session = login(host, sock, upnet_packet, message_display)
-        if session == '0':
+        if session is False:
             if reconnet == '1':
                 print "Server no response.Reconnecting..."
                 time.sleep(10)
                 main()
             else:
-                print "Login failed...Reason:Server has no response."
+                print "Login failed..."
                 sys.exit()
-        breathe(host, sock, mac_address, ip, session, index, block)
-        if breathe == '0':
+        breathe_status = breathe(
+            host, sock, mac_address, ip, session, index, block)
+        if breathe_status is False:
             if reconnet == '1':
                 print "Breathe failed.Reconnecting..."
                 time.sleep(10)
                 main()
             else:
-                print "Breathe failed..Reason:Something error."
+                print "Breathe failed..."
                 sys.exit()
 
 if __name__ == '__main__':
