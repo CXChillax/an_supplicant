@@ -1,6 +1,5 @@
 # !/usr/bin/python
 # -*-coding:utf-8-*-
-# 如果不能显示中文，请删除所有中文，并设置不显示服务器消息
 # bugreport:lyq19961011@gmail.com
 import sys
 import socket
@@ -10,14 +9,13 @@ import hashlib
 
 
 def send_data(host, sock, packet):
-    port = 3848
-    sock.sendto(packet, (host, port))
+    sock.sendto(packet, (host, 3848))
 
 
 def login(host, sock, packet, message_display):
     try:
         send_data(host, sock, packet)
-        response = sock.recv(3848)
+        response = sock.recv(4096)
         response = [i for i in struct.unpack('B' * len(response), response)]
         decrypt(response)
         login_status = response[20]
@@ -56,7 +54,7 @@ def breathe(host, sock, mac_address, ip_addr, session, index, block):
             mac_address, ip_addr, session, index, block)
         send_data(host, sock, breathe_packet)
         try:
-            breathe_response = sock.recv(3848)
+            breathe_response = sock.recv(4096)
         except socket.timeout:
             return False
         else:
@@ -176,42 +174,28 @@ def delay():
 
 
 def main():
-    host = ''  # 填上学校服务器IP,例如'210.45.194.10'
-    mac_address = ''  # MAC地址,例如'AA:AA:AA:AA:AA'
-    ip = ''  # IP地址,例如'192.168.1.1'
-    username = ''  # 用户名,例如'jack'
-    password = ''  # 密码,例如'123456'
-    version = '3.6.4'  # 安腾客户端版本号设置,例如'3.6.5'
-    dhcp_setting = '0'  # 是否开启DHCP自分配IP地址,'1'或'0'
-    service = 'int'  # 服务设置,例如'int','internet'
-    message_display = '0'  # 是否显示服务器返回的消息,'1'或'0'
-    delay_enabled = '0'  # 是否设置延迟选项，为了某些学校二次认证需要等待分配地址
-    reconnet = '1'  # 是否设置自动重连
-
-    if delay_enabled == '1':
+    if delay_enable == '1':
         delay()
-    print str('Ctrl + C to exit or login out\nMAC:'), mac_address, str('\nHOST:'), host, str('\nIP:'), ip
     index = 0x01000000
     block = [0x2a, 0x06, 0, 0, 0, 0, 0x2b, 0x06, 0, 0, 0, 0, 0x2c, 0x06, 0, 0, 0,
              0, 0x2d, 0x06, 0, 0, 0, 0, 0x2e, 0x06, 0, 0, 0, 0, 0x2f, 0x06, 0, 0, 0, 0]
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(5)
     while True:
         upnet_packet = generate_upnet(
-            mac_address, username, password, ip, dhcp_setting, service, version)
-        session = login(host, sock, upnet_packet, message_display)
+            auth_mac_address, username, password, auth_ip, dhcp_setting, service_type, client_version)
+        session = login(auth_host_ip, sock_udp,
+                        upnet_packet, message_display_enable)
         if session is False:
-            if reconnet == '1':
-                print "Server no response.Reconnecting..."
+            if reconnet_enable == '1':
+                print "Login failed...Reconnecting..."
                 time.sleep(10)
                 main()
             else:
                 print "Login failed..."
                 sys.exit()
         breathe_status = breathe(
-            host, sock, mac_address, ip, session, index, block)
+            auth_host_ip, sock_udp, auth_mac_address, auth_ip, session, index, block)
         if breathe_status is False:
-            if reconnet == '1':
+            if reconnet_enable == '1':
                 print "Breathe failed.Reconnecting..."
                 time.sleep(10)
                 main()
@@ -220,4 +204,41 @@ def main():
                 sys.exit()
 
 if __name__ == '__main__':
+
+    '''
+    auth_host_ip is the server ip such as '210.45.194.10'.
+    local_ip is the local host ip,use for bind send port.
+        It can deffient from auth_ip,but must be correct.
+    auth_ip is the ip your wanna to auth.Such as your wireless router Ethernet IP.
+    service_type means the acess point services.Such as 'int','internet'.
+
+    '''
+    '''
+    在auth_host_ip填上服务器的ip。
+    在local_ip填上本机的IP地址，用于绑定发送报文的端口，所以一定要求是正确的。
+    在auth_ip填上需要认证的IP地址，它可以是你的无线路由器的以太网地址。
+    如果你没有用路由器，那么local_ip和auth_ip应是相同的。
+    同样auth_mac_address需要填上你要认证的网卡的mac地址。例如路由器以太网卡，你的电脑的以太网卡。
+    在service_type填上你需要认证的服务类型，我见过的有'int'，'internet'，如果你填的不对，服务器可能会返回"该账号服务不可用"。
+    下个版本我会让它自动搜寻服务和服务器ip。
+    在dhcp_setting填上你是否需要认证之后再次进行DHCP自动分配IP。因为某些院校认证前后的IP是不一样的。
+
+    '''
+    auth_host_ip = '210.45.194.10'
+    local_ip = '192.168.2.212'
+    auth_ip = '172.143.1.1'
+    auth_mac_address = 'aa:bb:cc:dd:ee:ff'
+    username = 'jack'
+    password = '123456'
+    client_version = '3.6.4'
+    service_type = 'int'
+    dhcp_setting = '0'
+    message_display_enable = '0'  # Display the  replay message from server.
+    delay_enable = '0'  # Wait 10s to login in.  
+    reconnet_enable = '1'  # Auto reconnect while your breathe fail or login fail.
+    print str('Ctrl + C to exit or login out\nMac address:'), auth_mac_address, str('\nHost IPv4 address:'), auth_host_ip, str('\nAuth IPv4 address:'), auth_ip, str('\nLocal IPv4 address:'), local_ip
+    sock_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock_udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock_udp.bind((local_ip, 3848))
+    sock_udp.settimeout(5)
     main()
