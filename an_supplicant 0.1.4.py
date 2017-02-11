@@ -26,22 +26,22 @@ def login(host, sock, packet, message_display):
             11, 35) + 2:message_len + response.index(11, 35) + 2]
         if login_status == 0:
             if message_display == 1:
-                message = ''.join([struct.pack('B', i)
+                message = b''.join([struct.pack('B', i)
                                    for i in message]).decode('gbk')
-                print message
+                print (message)
                 sock.close()
                 sys.exit()
             else:
-                print str('Login fail')
+                print ('Login fail')
                 sock.close()
                 sys.exit()
         elif message_display == '1':
-            message = ''.join([struct.pack('B', i)
+            message = b''.join([struct.pack('B', i)
                                for i in message]).decode('gbk')
-            print message
+            print (message)
             return session
         else:
-            print str('Login success')
+            print ('Login success')
             return session
     except socket.error:
         return False
@@ -69,7 +69,7 @@ def breathe(host, sock, mac_address, ip_addr, session, index, block):
                 downnet_packet = generate_downnet(
                     mac_address, ip_addr, session, index, block)
                 send_data(host, sock, downnet_packet)
-                print str('\n'), str('Downnet success.')
+                print ('Downnet success.')
                 sock.close()
                 sys.exit()
 
@@ -107,10 +107,10 @@ def generate_upnet(mac, user, pwd, ip, dhcp, service, version):
     packet.extend([ord(i) for i in dhcp])
     packet.extend([0x1f, len(version) + 2])
     packet.extend([ord(i) for i in version])
-    md5 = hashlib.md5(''.join([struct.pack('B', i) for i in packet])).digest()
+    md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in packet])).digest()
     packet[2:18] = struct.unpack('16B', md5)
     encrypt(packet)
-    packet = ''.join([struct.pack('B', i) for i in packet])
+    packet = b''.join([struct.pack('B', i) for i in packet])
     return packet
 
 
@@ -132,10 +132,10 @@ def generate_breathe(mac, ip, session, index, block):
     packet.extend([int(index[0:-6], 16), int(index[-6:-4], 16),
                    int(index[-4:-2], 16), int(index[-2:], 16)])
     packet.extend(i for i in block)
-    md5 = hashlib.md5(''.join([struct.pack('B', i) for i in packet])).digest()
+    md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in packet])).digest()
     packet[2:18] = struct.unpack('16B', md5)
     encrypt(packet)
-    packet = ''.join([struct.pack('B', i) for i in packet])
+    packet = b''.join([struct.pack('B', i) for i in packet])
     return packet
 
 
@@ -157,10 +157,10 @@ def generate_downnet(mac, ip, session, index, block):
     packet.extend([int(index[0:-6], 16), int(index[-6:-4], 16),
                    int(index[-4:-2], 16), int(index[-2:], 16)])
     packet.extend(i for i in block)
-    md5 = hashlib.md5(''.join([struct.pack('B', i) for i in packet])).digest()
+    md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in packet])).digest()
     packet[2:18] = struct.unpack('16B', md5)
     encrypt(packet)
-    packet = ''.join([struct.pack('B', i) for i in packet])
+    packet = b''.join([struct.pack('B', i) for i in packet])
     return packet
 
 
@@ -186,31 +186,31 @@ def main():
                         upnet_packet, message_display_enable)
         if session is False:
             if reconnet_enable == '1':
-                print "Login failed...Reconnecting..."
+                print ('Login failed...Reconnecting...')
                 time.sleep(10)
                 main()
             else:
-                print "Login failed..."
+                print ('Login failed...')
                 sys.exit()
         breathe_status = breathe(
             auth_host_ip, sock_udp, auth_mac_address, auth_ip, session, index, block)
         if breathe_status is False:
             if reconnet_enable == '1':
-                print "Breathe failed.Reconnecting..."
+                print ('Breathe failed.Reconnecting...')
                 time.sleep(10)
                 main()
             else:
-                print "Breathe failed..."
+                print ('Breathe failed...')
                 sys.exit()
 
 if __name__ == '__main__':
 
     '''
-    auth_host_ip is the server ip such as '210.45.194.10'.
-    local_ip is the local host ip,use for bind send port.
+    The auth_host_ip is the server ip such as '210.45.194.10'.
+    The local_ip is the local host ip,use for bind send port.
         It can deffient from auth_ip,but must be correct.
-    auth_ip is the ip your wanna to auth.Such as your wireless router Ethernet IP.
-    service_type means the acess point services.Such as 'int','internet'.
+    The auth_ip is the ip your wanna to auth.Such as your wireless router Ethernet IP.
+    The service_type means the acess point services.Such as 'int','internet'.
 
     '''
     '''
@@ -236,9 +236,14 @@ if __name__ == '__main__':
     message_display_enable = '0'  # Display the  replay message from server.
     delay_enable = '0'  # Wait 10s to login in.  
     reconnet_enable = '1'  # Auto reconnect while your breathe fail or login fail.
-    print str('Ctrl + C to exit or login out\nMac address:'), auth_mac_address, str('\nHost IPv4 address:'), auth_host_ip, str('\nAuth IPv4 address:'), auth_ip, str('\nLocal IPv4 address:'), local_ip
+    print ('Ctrl + C to Exit or Login out!')
+    print ('Try to login in...')
     sock_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock_udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock_udp.bind((local_ip, 3848))
+    try:
+        sock_udp.bind((local_ip, 3848))
+    except socket.error:
+        print ('Bind port failed.')
+        sys.exit()
     sock_udp.settimeout(5)
     main()
