@@ -17,7 +17,7 @@ def login(host, sock, packet, message_display):
         send_data(host, sock, packet)
         response = sock.recv(4096)
         response = [i for i in struct.unpack('B' * len(response), response)]
-        decrypt(response)
+        response = decrypt(response)
         login_status = response[20]
         session_len = response[22]
         session = response[23:session_len + 23]
@@ -25,7 +25,7 @@ def login(host, sock, packet, message_display):
         message = response[response.index(
             11, 35) + 2:message_len + response.index(11, 35) + 2]
         if login_status == 0:
-            if message_display == 1:
+            if message_display == '1':
                 message = b''.join([struct.pack('B', i)
                                    for i in message]).decode('gbk')
                 print (message)
@@ -54,37 +54,40 @@ def breathe(host, sock, mac_address, ip_addr, session, index, block):
             mac_address, ip_addr, session, index, block)
         send_data(host, sock, breathe_packet)
         try:
-            breathe_response = sock.recv(4096)
+            breathe_status = sock.recv(4096)
         except socket.timeout:
             return False
-        else:
-            breathe_status = struct.unpack(
-                'B' * len(breathe_response), breathe_response)
-            if breathe_status[20] == 0:
-                return False
-            index += 3
-            try:
-                time.sleep(30)
-            except KeyboardInterrupt:
-                downnet_packet = generate_downnet(
-                    mac_address, ip_addr, session, index, block)
-                send_data(host, sock, downnet_packet)
-                print ('Downnet success.')
-                sock.close()
-                sys.exit()
+        breathe_status = [i for i in struct.unpack('B' * len(breathe_status), breathe_status)]
+        breathe_status = decrypt(breathe_status)
+        if breathe_status[20] == 0:
+            return False
+        index += 3
+        try:
+            time.sleep(30)
+        except KeyboardInterrupt:
+            downnet_packet = generate_downnet(
+                mac_address, ip_addr, session, index, block)
+            send_data(host, sock, downnet_packet)
+            print str('\n'), str('Downnet success.')
+            sock.close()
+            sys.exit()
 
 
 def encrypt(packet):
+    return_packet=[]
     for i in packet:
         i = (i & 0x80) >> 6 | (i & 0x40) >> 4 | (i & 0x20) >> 2 | (i & 0x10) << 2 | (
             i & 0x08) << 2 | (i & 0x04) << 2 | (i & 0x02) >> 1 | (i & 0x01) << 7
-
+        return_packet.append(i)
+    return return_packet
 
 def decrypt(packet):
+    return_packet=[]
     for i in packet:
         i = (i & 0x80) >> 7 | (i & 0x40) >> 2 | (i & 0x20) >> 2 | (i & 0x10) >> 2 | (
             i & 0x08) << 2 | (i & 0x04) << 4 | (i & 0x02) << 6 | (i & 0x01) << 1
-
+        return_packet.append(i)
+    return return_packet
 
 def generate_upnet(mac, user, pwd, ip, dhcp, service, version):
     packet = []
@@ -109,7 +112,7 @@ def generate_upnet(mac, user, pwd, ip, dhcp, service, version):
     packet.extend([ord(i) for i in version])
     md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in packet])).digest()
     packet[2:18] = struct.unpack('16B', md5)
-    encrypt(packet)
+    packet = encrypt(packet)
     packet = b''.join([struct.pack('B', i) for i in packet])
     return packet
 
@@ -134,7 +137,7 @@ def generate_breathe(mac, ip, session, index, block):
     packet.extend(i for i in block)
     md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in packet])).digest()
     packet[2:18] = struct.unpack('16B', md5)
-    encrypt(packet)
+    packet = encrypt(packet)
     packet = b''.join([struct.pack('B', i) for i in packet])
     return packet
 
@@ -159,7 +162,7 @@ def generate_downnet(mac, ip, session, index, block):
     packet.extend(i for i in block)
     md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in packet])).digest()
     packet[2:18] = struct.unpack('16B', md5)
-    encrypt(packet)
+    packet = encrypt(packet)
     packet = b''.join([struct.pack('B', i) for i in packet])
     return packet
 
