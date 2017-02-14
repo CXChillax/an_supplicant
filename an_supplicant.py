@@ -11,40 +11,51 @@ import hashlib
 def send_data(host, sock, packet):
     sock.sendto(packet, (host, 3848))
 
+def check_md5(md5,md5_recv):
+    for i in range(16):
+        if md5[i] != md5_recv[i]:
+            return False
+    return True
 
 def login(host, sock, packet, message_display):
-    try:
-        send_data(host, sock, packet)
-        response = sock.recv(4096)
-        response = [i for i in struct.unpack('B' * len(response), response)]
-        response = decrypt(response)
-        login_status = response[20]
-        session_len = response[22]
-        session = response[23:session_len + 23]
-        message_len = response[response.index(11, 35) + 1]
-        message = response[response.index(
-            11, 35) + 2:message_len + response.index(11, 35) + 2]
-        if login_status == 0:
-            if message_display == '1':
-                message = b''.join([struct.pack('B', i)
-                                   for i in message]).decode('gbk')
-                print (message)
-                sock.close()
-                sys.exit()
-            else:
-                print ('Login fail')
-                sock.close()
-                sys.exit()
-        elif message_display == '1':
+    send_data(host, sock, packet)
+    while True:
+        try:
+            response = sock.recv(4096)
+            response = [i for i in struct.unpack('B' * len(response), response)]
+            response = decrypt(response)
+            md5_recv = response[2:18]
+            response[2:18] = [i*0 for i in range(16)]
+            md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in response])).digest()
+            md5 = struct.unpack('16B',md5)
+            if check_md5(md5,md5_recv) is True:
+                break
+            response = []
+        except socket.error:
+            return False    
+    login_status = response[20]
+    session_len = response[22]
+    session = response[23:session_len + 23]
+    response[23:session_len+23]=[i*0 for i in range(session_len)]
+    message_len = response[response.index(11) + 1]
+    message = response[response.index(
+        11) + 2:message_len + response.index(11) + 2]
+    if login_status == 0:
+        if message_display == '1':
             message = b''.join([struct.pack('B', i)
                                for i in message]).decode('gbk')
             print (message)
-            return session
+            return False
         else:
-            print ('Login success')
-            return session
-    except socket.error:
-        return False
+            return False
+    elif message_display == '1':
+        message = b''.join([struct.pack('B', i)
+                           for i in message]).decode('gbk')
+        print (message)
+        return session
+    else:
+        print ('Login success')
+        return session
 
 
 def breathe(host, sock, mac_address, ip_addr, session, index, block):
@@ -59,11 +70,18 @@ def breathe(host, sock, mac_address, ip_addr, session, index, block):
             return False
         breathe_status = [i for i in struct.unpack('B' * len(breathe_status), breathe_status)]
         breathe_status = decrypt(breathe_status)
+        md5_recv = breathe_status[2:18]
+        breathe_status[2:18] = [i*0 for i in range(16)]
+        md5 = hashlib.md5(b''.join([struct.pack('B', i) for i in breathe_status])).digest()
+        md5 = struct.unpack('16B',md5)
+        if check_md5(md5,md5_recv) is False:
+            print 'md5 check failed!'
+            return False
         if breathe_status[20] == 0:
             return False
         index += 3
         try:
-            time.sleep(30)
+            time.sleep(20)
         except KeyboardInterrupt:
             downnet_packet = generate_downnet(
                 mac_address, ip_addr, session, index, block)
@@ -189,11 +207,12 @@ def main():
                         upnet_packet, message_display_enable)
         if session is False:
             if reconnet_enable == '1':
-                print ('Login failed...Reconnecting...')
+                print ('Login failed..Relogining...')
                 time.sleep(10)
                 main()
             else:
-                print ('Login failed...')
+                sock_udp.close()
+                time.sleep(1)
                 sys.exit()
         breathe_status = breathe(
             auth_host_ip, sock_udp, auth_mac_address, auth_ip, session, index, block)
@@ -204,6 +223,8 @@ def main():
                 main()
             else:
                 print ('Breathe failed...')
+                sock_udp.close()
+                time.sleep(1)
                 sys.exit()
 
 if __name__ == '__main__':
@@ -223,13 +244,11 @@ if __name__ == '__main__':
     如果你没有用路由器，那么local_ip和auth_ip应是相同的。
     同样auth_mac_address需要填上你要认证的网卡的mac地址。例如路由器以太网卡，你的电脑的以太网卡。
     在service_type填上你需要认证的服务类型，我见过的有'int'，'internet'，如果你填的不对，服务器可能会返回"该账号服务不可用"。
-    下个版本我会让它自动搜寻服务和服务器ip。
-    在dhcp_setting填上你是否需要认证之后再次进行DHCP自动分配IP。因为某些院校认证前后的IP是不一样的。
-
+    服务器和ip如果你不知道的话可以在另一个脚本search_server_access_point.py中搜寻到。
     '''
     auth_host_ip = '210.45.194.10'
     local_ip = '192.168.2.212'
-    auth_ip = '172.143.1.1'
+    auth_ip = '172.17.142.146'
     auth_mac_address = 'aa:bb:cc:dd:ee:ff'
     username = 'jack'
     password = '123456'
@@ -246,7 +265,7 @@ if __name__ == '__main__':
     try:
         sock_udp.bind((local_ip, 3848))
     except socket.error:
-        print ('Bind port failed.')
-        sys.exit()
+        print ('Bind port failed.Use random port')
+        pass
     sock_udp.settimeout(5)
     main()
