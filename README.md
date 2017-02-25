@@ -57,7 +57,14 @@ reconnet_enable = '1'  #呼吸或上线失败自动重连
 ```
 $ python an_supplicant.py -search
 ```
-![image](https://github.com/lyq1996/an_supplicant/blob/master/image/usage.jpeg)
+输出:  
+```
+root@OpenWrt:~# python /bin/an_supplicant.py -search
+Search host ip success:
+210.45.194.10
+Search service success:
+int
+```
 
 上线:  
 `注意`:在你运行之前，请确保`配置参数`都已填写正确。  
@@ -65,11 +72,18 @@ $ python an_supplicant.py -search
 ```
 $ python an_supplicant.py  
 ```
-![image](https://github.com/lyq1996/an_supplicant/blob/master/image/login_success.jpeg)
+输出:
+  
+```
+root@OpenWrt:~# python /bin/an_supplicant.py
+Try to login in...
+Login success
+Ctrl + C to Exit or Login out!
+```
 
 下线: 
 ``` 
-Ctrl＋C
+Ctrl ＋ C
 ```
 
 ## 一些其它事项:   
